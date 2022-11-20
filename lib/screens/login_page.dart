@@ -8,11 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/User.dart';
 
-const users = {
-  'dribbble@gmail.com': '12345',
-  'hunter@gmail.com': 'hunter',
-};
-
 class LoginScreen extends StatelessWidget {
   Duration get loginTime => const Duration(milliseconds: 2250);
   final String _email = '';
@@ -21,13 +16,13 @@ class LoginScreen extends StatelessWidget {
   Future<String?> loginPressed(LoginData data) async {
     final prefs = await SharedPreferences.getInstance();
 
-    debugPrint('Name: ${data.name}, Password: ${data.password}');
     return Future.delayed(loginTime).then((_) async {
       http.Response response =
           await AuthServices.login(data.name, data.password);
       Map responseMap = jsonDecode(response.body);
-      await prefs.setInt('user_id', responseMap['user']['id']);
-      // debugPrint('${responseMap['user']['id']}');
+      if (responseMap['user'] != null) {
+        await prefs.setInt('user_id', responseMap['user']['id']);
+      }
       return null;
     });
   }
