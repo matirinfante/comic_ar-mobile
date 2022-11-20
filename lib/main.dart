@@ -1,33 +1,44 @@
+import 'package:comic_ar/screens/home.dart';
+import 'package:comic_ar/screens/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+int? userId;
+
+Future<void> main() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  userId = prefs.getInt('user_id');
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return CupertinoApp(
-      debugShowCheckedModeBanner: false,
-      home: MyHome(),
-    );
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: userId != null ? OnBoard() : HomeScreen());
   }
 }
 
-class MyHome extends StatelessWidget {
+class OnBoard extends StatelessWidget {
   final Color kDarkBlueColor = const Color(0xFF053149);
 
   @override
   Widget build(BuildContext context) {
     return OnBoardingSlider(
-      finishButtonText: 'Registro',
+      finishButtonText: '¡Comenzar!',
       onFinish: () {
         Navigator.push(
           context,
-          CupertinoPageRoute(
-            builder: (context) => RegisterPage(),
+          MaterialPageRoute(
+            builder: (context) => LoginScreen(),
           ),
         );
       },
@@ -40,38 +51,22 @@ class MyHome extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      trailing: Text(
-        'Ingresar',
-        style: TextStyle(
-          fontSize: 16,
-          color: kDarkBlueColor,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      trailingFunction: () {
-        Navigator.push(
-          context,
-          CupertinoPageRoute(
-            builder: (context) => LoginPage(),
-          ),
-        );
-      },
       controllerColor: kDarkBlueColor,
       totalPage: 3,
       headerBackgroundColor: Colors.white,
       pageBackgroundColor: Colors.white,
       background: [
         Image.asset(
-          'assets/slide_1.png',
-          height: 400,
+          'assets/onboarding/booklover.png',
+          height: 300,
         ),
         Image.asset(
-          'assets/slide_2.png',
-          height: 400,
+          'assets/onboarding/bookshelves.png',
+          height: 300,
         ),
         Image.asset(
-          'assets/slide_3.png',
-          height: 400,
+          'assets/onboarding/readyread.png',
+          height: 300,
         ),
       ],
       speed: 1.8,
@@ -86,7 +81,7 @@ class MyHome extends StatelessWidget {
                 height: 480,
               ),
               Text(
-                'On your way...',
+                'Tus comics, organizados...',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: kDarkBlueColor,
@@ -98,7 +93,7 @@ class MyHome extends StatelessWidget {
                 height: 20,
               ),
               const Text(
-                'to find the perfect looking Onboarding for your app?',
+                'Podrás buscar dentro de una gran cantidad de comics',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black26,
@@ -119,7 +114,7 @@ class MyHome extends StatelessWidget {
                 height: 480,
               ),
               Text(
-                'You’ve reached your destination.',
+                'Una comicteca virtual',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: kDarkBlueColor,
@@ -131,7 +126,7 @@ class MyHome extends StatelessWidget {
                 height: 20,
               ),
               const Text(
-                'Sliding with animation',
+                'Para tener tu colección organizada y al dia',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black26,
@@ -152,7 +147,7 @@ class MyHome extends StatelessWidget {
                 height: 480,
               ),
               Text(
-                'Start now!',
+                'Empieza Ahora!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: kDarkBlueColor,
@@ -164,7 +159,7 @@ class MyHome extends StatelessWidget {
                 height: 20,
               ),
               const Text(
-                'Where everything is possible and customize your onboarding.',
+                'Y unite a la comunidad comiquera más grande de Argentina',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black26,
