@@ -1,15 +1,20 @@
-import 'package:comic_ar/screens/home.dart';
 import 'package:comic_ar/screens/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_onboarding_slider/flutter_onboarding_slider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'navigation.dart';
+import 'routes.dart';
+
 int? userId;
 
-Future<void> main() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  userId = prefs.getInt('user_id');
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [
+    //This line is used for showing the bottom bar
+  ]);
   runApp(MyApp());
 }
 
@@ -20,10 +25,42 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   @override
+  void initState() {
+    _getUserId();
+  }
+
+  _getUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getInt('user_id');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: userId != null ? OnBoard() : HomeScreen());
+        home: userId == null
+            ? OnBoard()
+            : const MainPageMenu(routesBuilder: subRoutes));
+  }
+}
+
+Route<dynamic> routes(RouteSettings settings) {
+  switch (settings.name) {
+    case '/':
+      return MaterialPageRoute(
+        builder: (_) => const MainPageMenu(routesBuilder: subRoutes),
+      );
+    case '/parent':
+      return MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(),
+          body: const Center(
+            child: Text('Parent'),
+          ),
+        ),
+      );
+    default:
+      throw 'unexpected Route';
   }
 }
 

@@ -1,11 +1,13 @@
 import 'dart:convert';
 
-import 'package:comic_ar/screens/home.dart';
+import 'package:comic_ar/navigation.dart';
+import 'package:comic_ar/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../routes.dart';
 import '../services/User.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -37,9 +39,6 @@ class LoginScreen extends StatelessWidget {
   Future<String> _recoverPassword(String name) {
     debugPrint('Name: $name');
     return Future.delayed(loginTime).then((_) {
-      if (!users.containsKey(name)) {
-        return 'User not exists';
-      }
       return 'ok';
     });
   }
@@ -58,7 +57,9 @@ class LoginScreen extends StatelessWidget {
       onSignup: _signupUser,
       onSubmitAnimationCompleted: () {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomeScreen(),
+          builder: (context) => const MainPageMenu(
+            routesBuilder: subRoutes,
+          ),
         ));
       },
       onRecoverPassword: _recoverPassword,
