@@ -42,6 +42,10 @@ dependencies:
   responsive_navigation_bar: ^3.2.6
   carousel_slider: ^4.1.1
   shared_preferences: ^2.0.15
+  bart: ^1.0.0
+  animations: ^2.0.7
+  google_fonts: ^3.0.1
+  tab_indicator_styler: ^2.0.0
 
 dev_dependencies:
   flutter_test:
