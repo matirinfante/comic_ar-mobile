@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:curved_progress_bar/curved_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -53,6 +55,68 @@ class _ComictecaPageState extends State<ComictecaPage> {
       physics: const BouncingScrollPhysics(),
       children: [
         Padding(
+            padding: const EdgeInsets.only(left: 25, top: 25),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Mi cómicteca',
+                  style: GoogleFonts.openSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      color: kBlackColor),
+                ),
+              ],
+            )),
+        Container(
+          height: 50,
+          margin: const EdgeInsets.only(left: 25, right: 25, top: 18),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10), color: kLightGreyColor),
+          child: Stack(
+            children: <Widget>[
+              TextField(
+                maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                style: GoogleFonts.openSans(
+                    fontSize: 15,
+                    color: kBlackColor,
+                    fontWeight: FontWeight.w600),
+                decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.only(left: 19, right: 50),
+                    border: InputBorder.none,
+                    hintText: 'Buscá una edición...',
+                    hintStyle: GoogleFonts.openSans(
+                        fontSize: 15,
+                        color: kGreyColor,
+                        fontWeight: FontWeight.w600)),
+              ),
+              Positioned(
+                  right: 0,
+                  top: 2,
+                  child: SizedBox.fromSize(
+                    size: const Size(48, 48),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.horizontal(
+                          left: Radius.circular(25)),
+                      child: Material(
+                        color: Colors.amberAccent,
+                        child: InkWell(
+                          splashColor: Colors.green,
+                          onTap: () {},
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const <Widget>[
+                              Icon(Icons.search_rounded),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ))
+            ],
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.all(2),
           child: FutureBuilder<List<Comicteca>>(
               future: getComicteca(),
@@ -64,13 +128,15 @@ class _ComictecaPageState extends State<ComictecaPage> {
                     items.add(comicteca);
                   });
                   return ListView.builder(
-                      //POPULAR
+                      //EDICIONES
                       padding:
                           const EdgeInsets.only(top: 25, right: 25, left: 25),
                       physics: ClampingScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: items.length,
                       itemBuilder: (context, index) {
+                        double percentage = (items[index].volumesOwned /
+                            items[index].totalVolumes);
                         return GestureDetector(
                           onTap: () {
                             print('ListView Tapped');
@@ -110,7 +176,7 @@ class _ComictecaPageState extends State<ComictecaPage> {
                                     Text(
                                       '${items[index].title}',
                                       style: GoogleFonts.openSans(
-                                          fontSize: 16,
+                                          fontSize: 17,
                                           fontWeight: FontWeight.w600,
                                           color: kBlackColor),
                                     ),
@@ -118,15 +184,26 @@ class _ComictecaPageState extends State<ComictecaPage> {
                                       height: 5,
                                     ),
                                     Text(
-                                      items[index].volumesOwned.toString() ??
-                                          "Publisher",
-                                      style: GoogleFonts.openSans(
-                                          fontSize: 10,
+                                      items[index].volumesOwned ==
+                                              items[index].totalVolumes
+                                          ? "Completada!"
+                                          : "Te faltan ${items[index].totalVolumes - items[index].volumesOwned}",
+                                      style: GoogleFonts.lato(
+                                          fontSize: 12,
                                           fontWeight: FontWeight.w400,
-                                          color: kGreyColor),
+                                          color: Colors.black54),
                                     ),
                                     const SizedBox(
-                                      height: 5,
+                                      height: 20,
+                                    ),
+                                    SizedBox(
+                                      width: 255,
+                                      child: CurvedLinearProgressIndicator(
+                                        value: percentage,
+                                        strokeWidth: 8,
+                                        backgroundColor: Colors.grey,
+                                        color: Colors.deepPurpleAccent,
+                                      ),
                                     ),
                                   ],
                                 )
