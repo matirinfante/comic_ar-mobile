@@ -2,6 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:bart/bart.dart';
 import 'package:comic_ar/screens/comicteca_page.dart';
 import 'package:comic_ar/screens/home.dart';
+import 'package:comic_ar/screens/profile_page.dart';
 import 'package:comic_ar/theme/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -37,9 +38,9 @@ List<BartMenuRoute> subRoutes() {
       label: "Perfil",
       icon: Icons.person_rounded,
       path: '/profile',
-      pageBuilder: (parentContext, tabContext, settings) => Container(
-          key: const PageStorageKey<String>("profile"),
-          child: const Center(child: Text('Profile page'))),
+      pageBuilder: (parentContext, tabContext, settings) => ProfilePage(
+        key: const PageStorageKey<String>("profile"),
+      ),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     )
