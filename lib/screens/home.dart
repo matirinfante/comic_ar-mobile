@@ -210,7 +210,7 @@ class HomeScreen extends StatelessWidget {
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               }),
         ),
         Padding(
@@ -305,7 +305,7 @@ class HomeScreen extends StatelessWidget {
               } else if (snapshot.hasError) {
                 return Text('${snapshot.error}');
               }
-              return const CircularProgressIndicator();
+              return const Center(child: CircularProgressIndicator());
             }),
       ],
     ));

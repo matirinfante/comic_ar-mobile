@@ -1,6 +1,8 @@
 import 'package:comic_ar/services/api.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tab_indicator_styler/tab_indicator_styler.dart';
 
 import '../theme/colors.dart';
@@ -16,11 +18,52 @@ class VolumeScreen extends StatefulWidget {
 
 class _VolumeScreen extends State<VolumeScreen> {
   final VolumeFull volume;
+
   _VolumeScreen(this.volume);
+
+  bool isAdded = false;
+  bool loading = true;
+
+  checkStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    var userId = prefs.getInt('user_id') ?? 0;
+    final response = await ApiServices.checkAdded(userId, volume.id);
+
+    if (response.statusCode == 200) {
+      var resp = response.body == "true" ? true : false;
+      setState(() {
+        isAdded = resp;
+        loading = false;
+      });
+    } else {
+      return false;
+      throw Exception("Failed to fetch!");
+    }
+  }
+
+  addToComicteca() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    var userId = prefs.getInt('user_id') ?? 0;
+    final response = await ApiServices.addComicteca(userId, volume.id);
+
+    if (response.statusCode == 201) {
+      setState(() {
+        isAdded = true;
+      });
+      Fluttertoast.showToast(msg: "Agregado a tu comicteca!");
+    } else if (response.statusCode == 409) {
+      Fluttertoast.showToast(msg: "Hey no!");
+    } else {
+      throw Exception("Failed to fetch!");
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    checkStatus();
   }
 
   @override
@@ -28,16 +71,32 @@ class _VolumeScreen extends State<VolumeScreen> {
     return Scaffold(
       bottomNavigationBar: Container(
         margin: const EdgeInsets.only(left: 25, right: 25, bottom: 25),
-        height: 49,
         color: Colors.transparent,
+        height: 49,
         child: ElevatedButton.icon(
-          onPressed: () {},
-          icon: const Icon(
-            Icons.add,
-            size: 24,
+          style: ElevatedButton.styleFrom(
+            primary: !isAdded ? Colors.indigoAccent : Colors.red,
           ),
+          onPressed: loading
+              ? null
+              : () {
+                  !isAdded
+                      ? addToComicteca()
+                      : Fluttertoast.showToast(
+                          msg: "Quitado de tu comicteca :(");
+                },
+          icon: loading
+              ? const CircularProgressIndicator()
+              : Icon(
+                  !isAdded ? Icons.add : Icons.delete,
+                  size: 24,
+                ),
           label: Text(
-            'Añadir a Comicteca',
+            loading
+                ? "Cargando..."
+                : !isAdded
+                    ? 'Añadir a Comicteca'
+                    : 'Quitar de Comicteca',
             style: GoogleFonts.openSans(
                 fontSize: 14, fontWeight: FontWeight.w600, color: kWhiteColor),
           ),

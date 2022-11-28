@@ -5,15 +5,13 @@ import 'package:http/http.dart' as http;
 import 'globals.dart';
 
 class ApiServices {
-  static Future<http.Response> addComicteca(
-      String name, String email, String password) async {
+  static Future<http.Response> addComicteca(int user_id, int volume_id) async {
     Map data = {
-      "name": name,
-      "email": email,
-      "password": password,
+      "user_id": user_id,
+      "volume_id": volume_id,
     };
     var body = json.encode(data);
-    var url = Uri.parse('${baseURL}auth/register');
+    var url = Uri.parse('${baseURL}comicteca');
     http.Response response = await http.post(
       url,
       headers: headers,
@@ -36,6 +34,13 @@ class ApiServices {
 
   static Future<http.Response> getComicteca(int id) async {
     var url = Uri.parse('${baseURL}comicteca/$id');
+    http.Response response = await http.get(url, headers: headers);
+    return response;
+  }
+
+  static Future<http.Response> checkAdded(int id, int volume_id) async {
+    var url =
+        Uri.parse('${baseURL}comicteca/alreadyThere/$id?volume_id=$volume_id');
     http.Response response = await http.get(url, headers: headers);
     return response;
   }

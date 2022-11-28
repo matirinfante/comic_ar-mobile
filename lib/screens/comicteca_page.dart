@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:curved_progress_bar/curved_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -139,14 +140,14 @@ class _ComictecaPageState extends State<ComictecaPage> {
                             items[index].totalVolumes);
                         return GestureDetector(
                           onTap: () {
-                            print('ListView Tapped');
-                            // Navigator.pushReplacement(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => VolumeScreen(
-                            //         volume: items[index], key: key),
-                            //   ),
-                            // );
+                            Fluttertoast.showToast(
+                                msg: "Proximamente...",
+                                toastLength: Toast.LENGTH_SHORT,
+                                gravity: ToastGravity.BOTTOM,
+                                timeInSecForIosWeb: 1,
+                                backgroundColor: Colors.amber,
+                                textColor: Colors.black,
+                                fontSize: 16.0);
                           },
                           child: Container(
                             margin: const EdgeInsets.only(bottom: 19),
@@ -215,7 +216,7 @@ class _ComictecaPageState extends State<ComictecaPage> {
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
-                return const CircularProgressIndicator();
+                return const Center(child: CircularProgressIndicator());
               }),
         )
       ],
