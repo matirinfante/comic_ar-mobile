@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:comic_ar/screens/volume_page.dart';
 import 'package:comic_ar/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key, required BuildContext parentContext}) : super(key: key);
 
   late Future<List<VolumeBasic>> futureVolumeLatest;
+  late Future<List<VolumeFull>> futureVolumePopular;
 
   Future<List<VolumeBasic>> getCarouselData() async {
     final response = await ApiServices.getLatest();
@@ -31,6 +33,32 @@ class HomeScreen extends StatelessWidget {
     }
   }
 
+  Future<List<VolumeFull>> getPopularBooks() async {
+    final response = await ApiServices.getPopular();
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      List<VolumeFull> popular = [];
+      for (var u in jsonResponse) {
+        VolumeFull volume = VolumeFull(
+            coverImage: u['coverImage'],
+            id: u['id'],
+            ISBN: u['ISBN'],
+            argument: u['argument'],
+            updatedAt: u['updated_at'],
+            number: u['number'],
+            createdAt: u['created_at'],
+            edition: Edition.fromJson(u['edition']),
+            title: u['title'],
+            editionId: u['edition_id']);
+        popular.add(volume);
+      }
+      return popular;
+    } else {
+      throw Exception("Failed to fetch!");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var idx = 1;
@@ -44,7 +72,8 @@ class HomeScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Holiwis, Matias',
+                  'Hola, Matias!',
+                  //TODO change this hardcode with actual user name
                   style: GoogleFonts.openSans(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -192,74 +221,92 @@ class HomeScreen extends StatelessWidget {
                 fontSize: 20, fontWeight: FontWeight.w600, color: kBlackColor),
           ),
         ),
-        ListView.builder(
-            padding: const EdgeInsets.only(top: 25, right: 25, left: 25),
-            physics: const BouncingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: 5,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  print('ListView Tapped');
-                  // Navigator.pushReplacement(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) =>
-                  //         SelectedBookScreen(popularBookModel: populars[index]),
-                  //   ),
-                  // );
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 19),
-                  height: 81,
-                  width: MediaQuery.of(context).size.width - 50,
-                  color: kBackgroundColor,
-                  child: Row(
-                    children: <Widget>[
-                      Container(
-                        height: 81,
-                        width: 62,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            // image: DecorationImage(
-                            //   image: AssetImage(populars[index].image),
-                            // ),
-                            color: kMainColor),
-                      ),
-                      const SizedBox(
-                        width: 21,
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "xd",
-                            style: GoogleFonts.openSans(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: kBlackColor),
+        FutureBuilder<List<VolumeFull>>(
+            future: getPopularBooks(),
+            builder: (context, snapshot) {
+              print(snapshot.data);
+              List<VolumeFull> items = [];
+              if (snapshot.hasData) {
+                snapshot.data?.forEach((volume) {
+                  items.add(volume);
+                });
+                return ListView.builder(
+                    //POPULAR
+                    padding:
+                        const EdgeInsets.only(top: 25, right: 25, left: 25),
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          print('ListView Tapped');
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  VolumeScreen(volume: items[index], key: key),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 19),
+                          height: 81,
+                          width: MediaQuery.of(context).size.width - 50,
+                          color: kBackgroundColor,
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                height: 81,
+                                width: 62,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5),
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                          items[index].coverImage ?? "a"),
+                                    ),
+                                    color: kMainColor),
+                              ),
+                              const SizedBox(
+                                width: 21,
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    '${items[index].title} #${items[index].number}',
+                                    style: GoogleFonts.openSans(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: kBlackColor),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    items[index].edition?.publisher ??
+                                        "Publisher",
+                                    style: GoogleFonts.openSans(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w400,
+                                        color: kGreyColor),
+                                  ),
+                                  const SizedBox(
+                                    height: 5,
+                                  ),
+                                ],
+                              )
+                            ],
                           ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                          Text(
-                            "editorial",
-                            style: GoogleFonts.openSans(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w400,
-                                color: kGreyColor),
-                          ),
-                          const SizedBox(
-                            height: 5,
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
-              );
-            })
+                        ),
+                      );
+                    });
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return const CircularProgressIndicator();
+            }),
       ],
     ));
   }
